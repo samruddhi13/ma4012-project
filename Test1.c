@@ -20,12 +20,35 @@
 
 
 int lineScan () {
-	if (SensorValue(Line2)==1||SensorValue(Line4)==1) {
+	if (SensorValue(Line2)==1) {
 		return 1;
+	}
+	if (SensorValue(Line4)==1) {
+		return 2;
 	}
 	else return 0;
 }
 
+void SideRun() {
+
+	if ((SensorValue(Line2)==1)||(SensorValue(Limit2)==1)) {
+		motor(motor1) = 25; //want opposite motor to reverse 
+		wait1Msec(1000);
+		motor(motor1) = 25;
+		wait1Msec(1000);
+	
+	
+}
+
+if ((SensorValue(Line4)==1)||(SensorValue(Limit4)==1)) {
+		
+		motor(motor2) = -25;
+		wait1Msec(2000);
+		motor(motor1) = 0;
+		wait1Msec(1000);	
+}
+
+}
 void reverse() {
 
 	/*	switch (SensorValue(Limit3))
@@ -112,10 +135,10 @@ void deliver()
 }
 
 
-void toNorth() {
-	
-	int direction = 8*SensorValue(compassWest)+4*SensorValue(compassSouth)+2*SensorValue(compassEast)+SensorValue(compassNorth);
-	while (direction != 14){
+void toDelPos() {
+
+	while ((SensorValue(compassWest)!= 1)&&(SensorValue(compassNorth)!= 1)
+		&&(SensorValue(compassEast)!= 0)&&(SensorValue(compassSouth)!= 0)){
 			motor(motor1) = -25;
 			motor(motor2) = -25;
 	}
@@ -133,7 +156,7 @@ task main()
 		int dist=detectBall();
 		int ballDone = 0;
 
-		while (corner==false) {
+		while (corner==0) {
 
 			while (dist==100000){
 
@@ -145,12 +168,16 @@ task main()
 			if (dist<100000){
 				travelToBall(dist);
 				scoop();
-				toNorth(); //14 should be north
+				toDelPos(); //north west is the right direction
 				reverse();
 				deliver();
 				ballDone++;
 
 
 		}}
+		
 	}
+	SideRun(); //do the linescanning and side limit hit move away code 
+	
+	// reverse if you hit front edge 
 }
