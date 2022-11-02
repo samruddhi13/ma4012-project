@@ -19,36 +19,27 @@
 // front is side 1, left is side 2, back is side 3, right side is side 4
 
 
-int lineScan () {
-	if (SensorValue(Line2)==1) {
-		return 1;
-	}
-	if (SensorValue(Line4)==1) {
-		return 2;
-	}
-	else return 0;
-}
-
-void SideRun() {
-
-	if ((SensorValue(Line2)==1)||(SensorValue(Limit2)==1)) {
+task lineScan () {
+		if ((SensorValue(Line2)==0)||(SensorValue(Limit2)==1)) {
 		motor(motor1) = 25; //want opposite motor to reverse 
 		wait1Msec(1000);
-		motor(motor1) = 25;
+		motor(motor1) = 0;
 		wait1Msec(1000);
 	
 	
 }
 
-if ((SensorValue(Line4)==1)||(SensorValue(Limit4)==1)) {
+if ((SensorValue(Line4)==0)||(SensorValue(Limit4)==1)) {
 		
 		motor(motor2) = -25;
 		wait1Msec(2000);
-		motor(motor1) = 0;
+		motor(motor2) = 0;
 		wait1Msec(1000);	
+
 }
 
 }
+
 void reverse() {
 
 	/*	switch (SensorValue(Limit3))
@@ -148,15 +139,12 @@ void toDelPos() {
 
 }
 
-task main()
+task main(){
+	startTask(lineScan, 10);
 
-{
 	while(true) {
-		int corner = lineScan();
 		int dist=detectBall();
 		int ballDone = 0;
-
-		while (corner==0) {
 
 			while (dist==100000){
 
@@ -175,9 +163,5 @@ task main()
 
 
 		}}
-		
+		//move back if hit front?
 	}
-	SideRun(); //do the linescanning and side limit hit move away code 
-	
-	// reverse if you hit front edge 
-}
