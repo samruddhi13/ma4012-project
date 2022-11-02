@@ -19,14 +19,24 @@
 // front is side 1, left is side 2, back is side 3, right side is side 4
 
 
-task lineScan () {
+task linelimitScan () {
+	if ((SensorValue(Line2)==0)||(SensorValue(Line4)==0)) {
+		motor(motor1) = -25; //want opposite motor to reverse 
+		motor(motor1) = 25; //want opposite motor to reverse 
+		wait1Msec(2000);
+		motor(motor1) = 0;
+		motor(motor2) = 0;
+		wait1Msec(1000);
+	
+	
+}
 		if ((SensorValue(Line2)==0)||(SensorValue(Limit2)==1)) {
 		motor(motor1) = 25; //want opposite motor to reverse 
 		wait1Msec(1000);
 		motor(motor1) = 0;
 		wait1Msec(1000);
 	
-	
+	//black is 1 yellow is 0 
 }
 
 if ((SensorValue(Line4)==0)||(SensorValue(Limit4)==1)) {
@@ -107,9 +117,10 @@ void scoop()
 
 void travelToBall(int dist) {
 	int travelDist = dist - 50;
-	motor(motor1)=-travelDist*127;
-	motor(motor2)=travelDist*127;
-	int timeToGo = 500; //adjusted based on how long it takes to move to ball
+	motor(motor1)=-127;
+	motor(motor2)=127;
+	int intermediate = (1/travelDist) + 0.42; //formula to linearize sensor data
+	int timeToGo = intermediate*27; //adjusted based on how long it takes to move to ball
 	wait1Msec(timeToGo);
 	motor(motor1)=-travelDist*127;
 	motor(motor2)=travelDist*127;
@@ -140,7 +151,7 @@ void toDelPos() {
 }
 
 task main(){
-	startTask(lineScan, 10);
+	startTask(linelimitScan, 10);
 
 	while(true) {
 		int dist=detectBall();
@@ -163,5 +174,4 @@ task main(){
 
 
 		}}
-		//move back if hit front?
 	}
