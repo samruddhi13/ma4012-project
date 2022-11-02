@@ -18,33 +18,44 @@
 
 // front is side 1, left is side 2, back is side 3, right side is side 4
 
+void travelToBall(int dist) {
+	int travelDist = dist - 50;
+	motor(motor1)=-127;
+	motor(motor2)=127;
+	int intermediate = (1/travelDist) + 0.42; //formula to linearize sensor data
+	int timeToGo = intermediate*27; //adjusted based on how long it takes to move to ball
+	wait1Msec(timeToGo);
+	motor(motor1)=-travelDist*127;
+	motor(motor2)=travelDist*127;
+
+}
 
 task linelimitScan () {
 	if ((SensorValue(Line2)==0)||(SensorValue(Line4)==0)) {
-		motor(motor1) = -25; //want opposite motor to reverse 
-		motor(motor1) = 25; //want opposite motor to reverse 
+		motor(motor1) = -25; //want opposite motor to reverse
+		motor(motor1) = 25; //want opposite motor to reverse
 		wait1Msec(2000);
 		motor(motor1) = 0;
 		motor(motor2) = 0;
 		wait1Msec(1000);
-	
-	
+
+
 }
 		if ((SensorValue(Line2)==0)||(SensorValue(Limit2)==1)) {
-		motor(motor1) = 25; //want opposite motor to reverse 
+		motor(motor1) = 25; //want opposite motor to reverse
 		wait1Msec(1000);
 		motor(motor1) = 0;
 		wait1Msec(1000);
-	
-	//black is 1 yellow is 0 
+
+	//black is 1 yellow is 0
 }
 
 if ((SensorValue(Line4)==0)||(SensorValue(Limit4)==1)) {
-		
+
 		motor(motor2) = -25;
 		wait1Msec(2000);
 		motor(motor2) = 0;
-		wait1Msec(1000);	
+		wait1Msec(1000);
 
 }
 
@@ -73,27 +84,15 @@ void reverse() {
 
 void moveFwd() {
 
-	motor(motor1) = 25;
-	motor(motor2) = -25;
+	motor(motor1) = 120;
+	motor(motor2) = -120;
 	wait1Msec(2000);
 }
 
-int detectBall() {
-	// this is darren's scan function
-	int ballSize = 150; //half of the ball, depend on curve
-	if((abs(Msensor-Lsensor)>ballSize) && (abs(Msensor-Rsensor)>ballSize)){
 
-		return Msensor;
-	}
-	else{
 
-		return 100000;
-	}
+void rotate60() {
 
-}
-
-void rotate60(int dist) {
-while (dist==100000) {
 	motor(motor1) = -25;
 	motor(motor2) = -25;
 	wait1Msec(1000);
@@ -101,7 +100,7 @@ while (dist==100000) {
 	motor(motor2) = 25;
 	wait1Msec(1000);
 }
-}
+
 
 void scoop()
 {
@@ -115,17 +114,7 @@ void scoop()
 
 }
 
-void travelToBall(int dist) {
-	int travelDist = dist - 50;
-	motor(motor1)=-127;
-	motor(motor2)=127;
-	int intermediate = (1/travelDist) + 0.42; //formula to linearize sensor data
-	int timeToGo = intermediate*27; //adjusted based on how long it takes to move to ball
-	wait1Msec(timeToGo);
-	motor(motor1)=-travelDist*127;
-	motor(motor2)=travelDist*127;
 
-}
 
 void deliver()
 {
@@ -150,28 +139,29 @@ void toDelPos() {
 
 }
 
-task main(){
-	startTask(linelimitScan, 10);
-
-	while(true) {
-		int dist=detectBall();
-		int ballDone = 0;
-
-			while (dist==100000){
-
-				if (ballDone<3) {
-					moveFwd();
-					rotate60(dist);
-				}
-			}
-			if (dist<100000){
-				travelToBall(dist);
-				scoop();
+task detectBall() {
+	int ballDone = 0;
+	// this is darren's scan function
+	int ballSize = 150; //half of the ball, depend on curve
+	if((abs(Msensor-Lsensor)>ballSize) && (abs(Msensor-Rsensor)>ballSize)){
+				travelToBall(Msensor);
+			  scoop();
 				toDelPos(); //north west is the right direction
 				reverse();
 				deliver();
 				ballDone++;
+	}
+	else{
 
+		if (ballDone<3) {
+					moveFwd();
+					rotate60();
+	}
+}
+}
 
-		}}
+task main(){
+  	startTask(linelimitScan, 10); 
+		startTask(detectBall, 9);
+
 	}
