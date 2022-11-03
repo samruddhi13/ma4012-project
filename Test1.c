@@ -31,6 +31,7 @@ void travelToBall(int dist) {
 }
 
 task linelimitScan () {
+	while (true){
 	if ((SensorValue(Line2)==0)||(SensorValue(Line4)==0)) {
 		motor(motor1) = -25; //want opposite motor to reverse
 		motor(motor1) = 25; //want opposite motor to reverse
@@ -59,6 +60,7 @@ if ((SensorValue(Line4)==0)||(SensorValue(Limit4)==1)) {
 
 }
 
+}
 }
 
 void reverse() {
@@ -143,6 +145,7 @@ task detectBall() {
 	int ballDone = 0;
 	// this is darren's scan function
 	int ballSize = 150; //half of the ball, depend on curve
+	while (true){
 	if((abs(Msensor-Lsensor)>ballSize) && (abs(Msensor-Rsensor)>ballSize)){
 				travelToBall(Msensor);
 			  scoop();
@@ -157,6 +160,7 @@ task detectBall() {
 					moveFwd();
 					rotate60();
 	}
+}
 }
 }
 
