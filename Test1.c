@@ -22,21 +22,36 @@ int scoopflag = 0;
 
 int ballSize = 300; //half of the ball, depend on curve
 int i = 1;
+int j = 1; //while loop flag for traveltoball
 
 void travelToBall(int dist) {
-	int travelDist = dist - 50;
+		while(true){
+		motor[motor1] = -25; //correcting for one motor being a bit stronger
+		motor[motor2] = 25;
+		if (SensorValue(Msensor)>1900) {
+			motor[motor1] = 0;
+			motor[motor2] = 0;
+			break;
+			
+		}
+		
+	}
+		wait1Msec(1000);
+		
+}
+/*	int travelDist = dist - 400;
 	motor[motor1]=-50;
 	motor[motor2]=50;
 	float distance = 30431 * pow(travelDist, -1.169);//adjusted based on how long it takes to move to ball
-	wait1Msec(distance/36*1000);
+	wait1Msec((distance/14)*1000); //14 chosen because not running at full speedm 36 for full speed
 	motor[motor1]=0;
 	motor[motor2]=0;
-
-}
+	wait1Msec(3000); */
 
 task linelimitScan () {
+	//must disregard line2 while testing on floor because it will always trigger
 	while (true){
-		if ((SensorValue(Line2)==0)||(SensorValue(Line4)==0)) {
+		if (/*(SensorValue(Line2)==0)||*/(SensorValue(Line4)==0)) {
 			motor[motor1] = -25; //want opposite motor to reverse
 			motor[motor1] = 25; //want opposite motor to reverse
 			wait1Msec(2000);
@@ -46,7 +61,7 @@ task linelimitScan () {
 
 
 		}
-		if ((SensorValue(Line2)==0)||(SensorValue(Limit2)==0)) {
+		if (/*(SensorValue(Line2)==0)||*/(SensorValue(Limit2)==0)) {
 			motor[motor1] = 25; //want opposite motor to reverse
 			wait1Msec(1000);
 			motor[motor1] = 0;
@@ -106,11 +121,12 @@ void rotate60() {
 
 void scoop()
 {
-
-	motor[scoopmotor] = 50;
-	wait1Msec(1000);
+	motor[scoopmotor] = 100;
 	flag = 1;
+	wait1Msec(300);
 	motor[scoopmotor] = 0;
+	motor[motor1] = 0;
+	motor[motor2] = 0;
 
 	wait1Msec(1000);
 	// 250 causes a roughly 60 degree rotation
@@ -121,9 +137,15 @@ void pivot() {
 
 	//function to pivot when traveltoball is completed, and before scoop
 
-	motor[motor1] = 25 ;
-	wait1Msec(250);
+		motor[motor1] = -25 ;
+	motor[motor2] = -25 ;
+	wait1Msec(300);
+	motor[motor1] = -25;
+	motor[motor2] = 25;
+	wait1Msec(600);
 	motor[motor1] = 0;
+	motor[motor2] = 0;
+	wait1Msec(400);
 
 }
 
@@ -164,23 +186,26 @@ task detectBall() {
 		int L = SensorValue(Lsensor);
 		int R = SensorValue(Rsensor);
 		if(((SensorValue(Msensor)-SensorValue(Lsensor))<ballSize) && ((SensorValue(Msensor)-SensorValue(Rsensor))<ballSize)){
-			travelToBall(SensorValue(Msensor)); //ERROR
-		  pivot(); //WIP parameters
+		scoopflag = 1;
+		travelToBall(M);
+		flag = 1;
+	  pivot(); //WIP parameters
+	  scoopflag = 1; 
 			scoop();  //WIP parameters
-			scoopflag = 1;
+	/*		scoopflag = 1;
 		//	toDelPos(); //north west is the right direction //working
 			wait1Msec(1000); //to TEST
-	/*		flag = 1;
+			flag = 1;
 			 //resetting flag for todelpos()
 			reverse();
-			deliver();  
+			deliver();
 			ballDone++;  */
 		}
 		/*	else{
 
 		if (ballDone<3) {
 		moveFwd(); //working
-		rotate60();} //working
+		rotate60();} //working 
 		} */
 	}
 }
