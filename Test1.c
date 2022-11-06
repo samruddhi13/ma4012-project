@@ -26,7 +26,7 @@ int j = 1; //while loop flag for traveltoball
 
 void travelToBall(int dist) {
 		while(true){
-		motor[motor1] = -25; //correcting for one motor being a bit stronger
+		motor[motor1] = -20; //correcting for one motor being a bit stronger
 		motor[motor2] = 25;
 		if (SensorValue(Msensor)>1900) {
 			motor[motor1] = 0;
@@ -121,9 +121,13 @@ void rotate60() {
 
 void scoop()
 {
-	motor[scoopmotor] = 100;
+	
+  motor[motor1] = -25;
+  motor[motor2] = 25;
 	flag = 1;
 	wait1Msec(300);
+	motor[scoopmotor] = 100;
+	wait1Msec(500);
 	motor[scoopmotor] = 0;
 	motor[motor1] = 0;
 	motor[motor2] = 0;
